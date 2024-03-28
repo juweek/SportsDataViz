@@ -1,0 +1,53 @@
+<button id="loadData">Load Data</button>
+<script>
+    /*
+=========
+    CREATE a button and on CLICK, use the apiKey to fetch temptoken and rest of results
+=======
+    */
+document.getElementById('loadData').addEventListener('click', async function() {
+  try {
+    const tokenUrl = 'https://project.trumedianetworks.com/api/token';
+    const apiUrl = 'https://project.trumedianetworks.com/api/mlb/dataviz-data-aggregate';
+    const apiKey = '';
+
+    //Make the GET request to get the tempToken
+    const tokenResponse = await fetch(tokenUrl, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'apiKey': apiKey
+      }
+    });
+
+    //error msg
+    if (!tokenResponse.ok) {
+      throw new Error('Network response was not ok when getting tempToken');
+    }
+
+    // Extract the tempToken
+    const tokenData = await tokenResponse.json();
+    const tempToken = tokenData.token; 
+
+    // GET request using the tempToken
+    const dataResponse = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'temptoken': tempToken
+      }
+    });
+
+       //error msg
+    if (!dataResponse.ok) {
+      throw new Error('Network response was not ok when getting MLB data');
+    }
+
+    //print out the data
+    const data = await dataResponse.json();
+    console.log(data);
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+  }
+});
+</script>
