@@ -1,53 +1,123 @@
-<button id="loadData">Load Data</button>
-<script>
-    /*
-=========
-    CREATE a button and on CLICK, use the apiKey to fetch temptoken and rest of results
-=======
-    */
-document.getElementById('loadData').addEventListener('click', async function() {
-  try {
-    const tokenUrl = 'https://project.trumedianetworks.com/api/token';
-    const apiUrl = 'https://project.trumedianetworks.com/api/mlb/dataviz-data-aggregate';
-    const apiKey = '';
+<!DOCTYPE html>
+<html>
 
-    //Make the GET request to get the tempToken
-    const tokenResponse = await fetch(tokenUrl, {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'apiKey': apiKey
-      }
-    });
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>MLB 133 Batters</title>
+  <link href="main.css" rel="stylesheet" type="text/css" />
+  <link href="style.css" rel="stylesheet" type="text/css" />
 
-    //error msg
-    if (!tokenResponse.ok) {
-      throw new Error('Network response was not ok when getting tempToken');
-    }
+</head>
+<script src="https://d3js.org/d3.v4.js"></script>
+<body class="gridContainer">
+  <div class="bodyContent readingAchievement">
+    <div class="bodyContentIntro">
+      <h2>TruMedia</h2>
+      <h3 class="bodyContentSubhead">MLB 133 Batters</h3>
+      <h3>Created by <a href="https://juweek.studio">Juweek Adolphe</a></h3>
 
-    // Extract the tempToken
-    const tokenData = await tokenResponse.json();
-    const tempToken = tokenData.token; 
+      <!-- Create a div where the graph will take place -->
+      <h3 id="graphTitle" class="graphTitle"><b>MLB 133 Batters</b>
+      </h3>
 
-    // GET request using the tempToken
-    const dataResponse = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'temptoken': tempToken
-      }
-    });
+      <div class="modalContent">
+        <img src="./keyImage.svg" alt="SVG Image">
+      </div>
 
-       //error msg
-    if (!dataResponse.ok) {
-      throw new Error('Network response was not ok when getting MLB data');
-    }
+      <div class="modalContentGroup">
+        <button id="downloadButton1">Download Graph as PNG</button>
+        <div class="modal__text graphHeaderBox">
+          <div style="border-right: 1px dashed #333;">
+            <div class="keyBlockSubhead"></div>
+            <div class="keyBlockSub">
+              <div class="keyBlockYes" style="background-color: #c1c2e0; border: 1px solid #c1c2e0;"></div>
+              <div>Left Handed</div>
+            </div>
+            <div class="keyBlockSub">
+              <div class="keyBlockYes" style="background-color: #E9CBCC; border: 1px solid #b39595;"></div>
+              <div>Right Handed</div>
+            </div>
+          </div>
+          <!-- Filter out form -->
+          <div class="formsContainer">
+            <div id="searchBarSelectorContainer">
+              <input id="searchBarSelector" type="text" name="search" placeholder="Search for a player"
+                autocomplete="off" />
+              <div id="resultsSelector"></div>
+            </div>
+            <!-- Create the a dropdown menu that will allow you to select certain countries -->
+            <div id="searchBarResultsContainer">
+              <div id="searchBarResults"></div>
+            </div>
 
-    //print out the data
-    const data = await dataResponse.json();
-    console.log(data);
-  } catch (error) {
-    console.error('There was a problem with the fetch operation:', error);
-  }
-});
-</script>
+            <!-- Create a 'Sort By' dropdown that will be used to sort the graph -->
+            <div style="display: flex;">
+              <div class="dropdownWrapper">
+                <select id="sortDropdown" class="dropdownMenu" placeholder="Search for country" name="sortBy">
+                  <option selected value="Country">Sort By: Name (Alphabetical)</option>
+                  <option value="homeRuns">Sort By: Home Runs</option>
+                  <option value="singles">Sort By: Singles</option>
+                  <option value="doubles">Sort By: Doubles</option>
+                  <option value="triples">Sort By: Triples</option>
+                </select>
+              </div>
+              <div class="dropdownWrapper">
+                <!-- Create a 'Sort Order' dropdown that will be used to sort the graph -->
+                <select id="orderDropdown" class="dropdownMenu" name="sortOrder">
+                  <option value="asc">Lowest first</option>
+                  <option selected value="desc">Highest first</option>
+                </select>
+              </div>
+            </div>
+            <!-- Create the delayed assessment checkboxes -->
+            <div id="assessmentCheckbox" style="display: flex;">
+              <input type="checkbox" id="option1" name="option1" value="Option1" checked>
+              <label for="option1"> Left-Handed</label><br>
+
+              <input type="checkbox" id="option2" name="option2" value="Option2" checked>
+              <label for="option2"> Right-Handed
+              </label><br>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="graphContainer">
+        <div id="my_dataviz"></div>
+        <div id="datavizCopy">
+          <div id="tableHeader">
+            <div class="tableCountry" style="font-weight: bold;">
+              <p>Country</p>
+              <p>Singles</p>
+              <p>Doubles</p>
+              <p>Triples</p>
+              <p>Hits</p>
+            </div>
+          </div>
+          <div id="tableContent">
+            <div id="columnTitles">
+              <!-- Your column titles here -->
+            </div>
+            <div id="dataContainer">
+              <!-- Your data will be appended here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <svg id="xAxisDiv">
+      </svg>
+
+      <div class="formsContainer">
+      </div>
+    </div>
+
+
+    <!-- Create a tooltip that will appear on the hover of certain elements -->
+    <div id="tooltip" class="tooltip">
+    </div>
+  </div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
